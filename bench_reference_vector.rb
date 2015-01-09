@@ -46,11 +46,7 @@ end
 def load_data(num_loop)
   num_loop.times.each do |i|
     print(<<-EOH.strip)
-{"_key": "http://groonga.org/", "tags": "#{article_tags}"},
-{"_key": "http://mroonga.org/", "tags": "#{article_tags}"},
-{"_key": "http://ranguba.org/", "tags": "#{article_tags}"},
-{"_key": "http://droonga.org/", "tags": "#{article_tags}"},
-{"_key": "http://nroonga.github.io/", "tags": "#{article_tags}"},
+{"_key": "http://groonga.org/#{i}", "tags": "#{article_tags}"},
 EOH
   end
 end
