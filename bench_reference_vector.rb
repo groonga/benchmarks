@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+# usage:
+#   % rm -rf db; mkdir -p db
+#   % ruby bench_reference_vector.rb | groonga -n db/test.db 1>2&
+
 def random_tag
   random_tag = (0...8).map{ (65 + rand(26)).chr }.join
   random_tag
