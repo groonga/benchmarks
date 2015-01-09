@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
+require 'open3'
 
 # usage:
 #   % rm -rf db; mkdir -p db
-#   % ruby bench_reference_vector.rb | groonga -n db/test.db 1>2&
+#   % ruby bench_reference_vector.rb
 
 def random_tag
   random_tag = (0...8).map{ (65 + rand(26)).chr }.join
@@ -42,23 +43,25 @@ def article_tags
   article_tags
 end
 
-def create_table
-  print(<<-EOH.strip)
+def create_table(dbpath)
+  command = <<-EOH.strip
 table_create Tags TABLE_HASH_KEY ShortText
 table_create Articles TABLE_HASH_KEY ShortText
 column_create Articles tags COLUMN_VECTOR Tags
 EOH
+  Open3.capture3("groonga -n #{dbpath}", stdin_data: command)
 end
 
-def load_data(num_loop, dirname, print_frequency)
+def load_data(num_loop, dbpath, print_frequency)
   num_loop.times.each do |i|
-    puts(<<-EOH.strip)
+    command = <<-EOH.strip
 load --table Articles
 [
 {"_key": "http://groonga.org/#{i}", "tags": "#{article_tags}"},
 ]
 EOH
-    if (i % print_frequency) == 0
+    out, _, _ = Open3.capture3("groonga #{dbpath}", stdin_data: command)
+    if (out && i % print_frequency) == 0
       get_dir_size(dirname, i)
     end
   end
@@ -66,6 +69,7 @@ end
 
 target_records_size = 100000
 print_frequency = target_records_size / 10
-create_table
-load_data(target_records_size, "db", print_frequency)
+dbpath = "db/test.db"
+create_table(dbpath)
+load_data(target_records_size, dbpath, print_frequency)
 get_dir_size("db", target_records_size)
