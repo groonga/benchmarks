@@ -48,11 +48,14 @@ load --table Articles
 EOH
 end
 
-def load_data(num_loop)
+def load_data(num_loop, dirname, print_frequency)
   num_loop.times.each do |i|
     print(<<-EOH.strip)
 {"_key": "http://groonga.org/#{i}", "tags": "#{article_tags}"},
 EOH
+    if (i % print_frequency) == 0
+      get_dir_size(dirname, i)
+    end
   end
 end
 
@@ -60,6 +63,9 @@ def eof_data
   print("]")
 end
 
+target_records_size = 100000
+print_frequency = target_records_size / 10
 create_table
-load_data(10000)
+load_data(target_records_size, "db", print_frequency)
 eof_data
+get_dir_size("db", target_records_size)
