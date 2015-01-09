@@ -27,6 +27,11 @@ def get_unknown_tags
   unknown_tags
 end
 
+def get_dir_size(dirname, num_records=0)
+  size = `du #{dirname}`
+  STDERR.puts("#{num_records} record(s): #{size}")
+end
+
 def article_tags
   article_tags = get_known_tags
   article_tags.concat(get_unknown_tags)
